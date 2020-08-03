@@ -1,0 +1,11 @@
+{
+  "transforms": [
+    {
+        "fromTopic": "tele/tasmota/STATE",
+        "toTopic": "transformed/tasmota-state",
+        "emitInterval": 60,
+        "emitType": "repeat",
+        "template": {"uptime": {"$eval": "UptimeSec"}}
+    }
+  ]
+}

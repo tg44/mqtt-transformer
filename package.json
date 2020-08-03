@@ -1,0 +1,20 @@
+{
+  "name": "mqtt-transformer",
+  "version": "1.0.0",
+  "description": "A simple service which consumes, transforms and periodically republish json messages on mqtt.",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/tg44/mqtt-transformer.git"
+  },
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "tg44",
+  "license": "ISC",
+  "dependencies": {
+    "json-e": "^4.1.0",
+    "mqtt": "^4.1.0"
+  }
+}
