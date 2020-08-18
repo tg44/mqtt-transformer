@@ -1,11 +1,49 @@
 {
   "transforms": [
     {
-        "fromTopic": "tele/tasmota/STATE",
-        "toTopic": "transformed/tasmota-state",
-        "emitInterval": 60,
-        "emitType": "repeat",
-        "template": {"uptime": {"$eval": "UptimeSec"}}
-    }
+            "fromTopic": "export/crypto",
+            "toTopic": "transformed/crypto-repeat",
+            "emitInterval": 60,
+            "emitType": "repeat",
+            "template": {"message": "BTC ${bitcoin.usd}  ETH ${ethereum.usd}"}
+        },
+        {
+            "fromTopic": "export/crypto",
+            "toTopic": "transformed/crypto-once",
+            "emitInterval": 60,
+            "emitType": "once",
+            "template": {"message": "BTC ${bitcoin.usd}  ETH ${ethereum.usd}"}
+        },
+        {
+            "fromTopic": "tele/sp-desk/STATE",
+            "toTopic": "transformed/sp-desk-state",
+            "emitType": "map",
+            "template": {"uptime": {"$eval": "UptimeSec"}}
+        },
+        {
+            "fromTopic": "tele/wemos-dev/SENSOR",
+            "toTopic": "transformed/wemos-dev/filter",
+            "emitType": "filter",
+            "filterTemplate": {"$if": "TSL2561.Illuminance < 3", "then": true, "else": false}
+        },
+        {
+            "fromTopic": "tele/wemos-dev/SENSOR",
+            "toTopic": "transformed/wemos-dev/collect",
+            "emitType": "collect",
+            "filterTemplate": {"$if": "TSL2561.Illuminance < 3", "then": true, "else": false},
+            "template": {"time": "${Time}"}
+        },
+        {
+            "fromTopics": ["tele/sp-desk/STATE", "tele/wemos-dev/STATE"],
+            "toTopic": "transformed/zip",
+            "emitType": "zipLast",
+            "template": {"uptimeDesk": "${messages[0].UptimeSec}", "uptimeWemos": "${messages[1].UptimeSec}", "sum": {"$eval": "messages[0].UptimeSec + messages[1].UptimeSec"}}
+        },
+        {
+            "fromTopics": ["tele/sp-desk/STATE", "tele/wemos-dev/STATE"],
+            "toTopic": "transformed/combineLatest",
+            "emitType": "combineLatest",
+            "template": {"uptimeDesk": "${messages[0].UptimeSec}", "uptimeWemos": "${messages[1].UptimeSec}", "sum": {"$eval": "messages[0].UptimeSec + messages[1].UptimeSec"}}
+        }
   ]
 }

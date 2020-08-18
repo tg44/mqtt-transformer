@@ -27,25 +27,56 @@ The app works with one `conf.json` which looks like this;
   ]
 }
 ```
-You can have multiple transforms in the array, but the from topic should be uniqe!
+You can have multiple transforms in the array!
 
-The `fromTopic` and `toTopic` should be self describing.
+The required fields are; `toTopic`, `emitType`, and either `fromTopic` as a string or `fromTopics` as an array of strings. The other fields may vary based on the choosen `emitType`.
 
-The `emitInterval` is the minimum time in seconds between message emits to the toTopic.
+The `template` or `filterTemplate` parameter is the trickiest. The app uses [json-e](https://github.com/taskcluster/json-e) underneath, so you need to cook up a valid json-e transformation.
+Read [the docs](https://github.com/taskcluster/json-e#language-reference) for reference.
+(For concrete examples and use-cases; help me by opening an issue or PR. For minimal examples you can check the `conf/config.json`.)
 
-The `emitType` could be `repeat` or `once` both will emit for the first seen message, but while 
+
+### Emit types
+
+#### Transformation - map
+
+Maps with the given `template`.
+
+#### Filter - filter and collect
+
+Filters with the `filterTemplate`. The `filterTemplate` must return with true/false for correctly describe your intention.
+(It's javascript and I filter with `if(result)` so technically you can return false/null/undefined/0/empty-string/empty-array for false values and anything else for true, but still...)
+
+Filter will emit the given message as is if the `filterTemplate` returns true, while collect will do a map on it with the `template`. 
+If the `filterTemplate` returns false it will not emit.
+
+#### Time driven types - repeat and once
+
+The `emitInterval` is the minimum time in seconds between message emits to the `toTopic`.
+
+Both will emit for the first seen message, but while 
 `once` will not emit until the `emitInterval` is zeroed (and then next emit when it sees a new message in the topic), 
 `repeat` will send the last seen message whenever the interval is passed.
 
-The `template` parameter is the trickiest. The app uses [json-e](https://github.com/taskcluster/json-e) underneath, so you need to cook up a valid json-e transformation.
-Read [the docs](https://github.com/taskcluster/json-e#language-reference) for reference.
-(For concrete examples and use-cases help me by opening an issue or PR.)
+Both maps with the given `template`.
+
+#### Combine multiple topics - zipLast and combineLatest
+
+CombineLatest works the same as [reactiveX defines it](http://reactivex.io/documentation/operators/combinelatest.html).
+
+ZipLast kinda works like zip. It waits till it gets at least one element in all of its topics, BUT always keeping the last element if it gets more than one in the same topic.
+When it gets an element in each topic, it calls the `template`, emits the output, and clears all of the saved elements.
+
+The `template` will get a `{messages: []}` object, the indexes will match to the topic indexes.
+
 
 ## Running the app
 
 ### Local install / dev
 You need node 12, start with `npm i` and then `node app.js`.
 For setting the mqtt server other than localhost you need to `export MQTT_URL="mqtt://myserver:1883"` before the service start.
+
+For enable debugging you can  `export IS_VERBOSE=true`
 
 ### Docker and compose
 For docker you can run;
@@ -64,3 +95,6 @@ services:
     environment:
       - MQTT_URL=mqtt://myserver:1883
 ```
+
+In the early config/template writing/testing phase, you can add the `IS_VERBOSE` env var too. 
+That will log all the incoming messages alongside with the rule id, the applied template, and the resulting output.
