@@ -1,0 +1,24 @@
+---
+layout: default
+---
+{% assign slug = page.name | slugify %}
+{% include breadcrumbs.html %}
+
+<h2>{{page.name}}</h2>
+
+<a href="{{ page.github }}"><h4><span class="badge badge-primary">Github page</span></h4></a>
+
+{{content}}
+
+<h3>Recipes</h3>
+<ul>
+  {% for recipe in site.recipes %}
+  {% if recipe.tools contains slug %}
+  <li>
+    <a href="{{ recipe.url }}">
+      {{ recipe.title }}
+    </a>
+  </li>
+  {% endif %}
+  {% endfor %}
+</ul>

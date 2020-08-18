@@ -1,0 +1,27 @@
+---
+layout: default
+---
+{% assign tags =  site.recipes | map: 'tags' | join: ','  | split: ',' | uniq | sort %}
+
+{% for tag in tags %}
+  <a href="#{{ tag | slugify }}">
+    <span class="badge badge-secondary">
+      {{ tag }}
+    </span>
+  </a>
+{% endfor %}
+
+{% for tag in tags %}
+  <h2 id="{{ tag | slugify }}">{{ tag }}</h2>
+  <ul>
+    {% for recipe in site.recipes %}
+        {% if recipe.tags contains tag %}
+            <li>
+                <a href="{{ recipe.url }}">
+                    {{ recipe.title }}
+                </a>
+            </li>
+        {% endif %}
+    {% endfor %}
+  </ul>
+{% endfor %}

@@ -1,0 +1,39 @@
+---
+layout: default
+---
+
+<span>Some example code sippets for tools, and use-cases.</span>
+
+<h3>Tools</h3>
+<div class="row row-cols-1 row-cols-md-2">
+  {% for tool in site.tools %}
+  <div class="col mb-4">
+    <div class="card" style="width: 18rem;">
+      <div class="card-body">
+        <h5>
+          <a href="{{ tool.url }}">
+            {{ tool.name }}
+          </a>
+        </h5>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<h3>Recipes</h3>
+<div class="row row-cols-1 row-cols-md-2">
+  {% for recipe in site.recipes %}
+  <div class="col mb-4">
+    <div class="card" style="width: 18rem;">
+      <div class="card-body">
+        <h5>
+          <a href="{{ recipe.url }}">
+            {{ recipe.name }}
+          </a>
+        </h5>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>

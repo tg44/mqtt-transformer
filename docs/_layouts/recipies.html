@@ -1,0 +1,26 @@
+---
+layout: default
+---
+{% include breadcrumbs.html %}
+
+<h2>{{page.name}}</h2>
+
+<b>Tools:</b>
+{% for tool in page.tools %}
+<a class="tag" href="/tools/{{ tool | slugify }}">
+    <span class="badge badge-info">
+      {{ tool }}
+    </span>
+</a>
+{% endfor %}
+<br/>
+<b>Tags:</b>
+{% for tag in page.tags %}
+  <a class="tag" href="/tags/#{{ tag | slugify }}">
+    <span class="badge badge-secondary">
+      {{ tag }}
+    </span>
+  </a>
+{% endfor %}
+<br/>
+{{content}}

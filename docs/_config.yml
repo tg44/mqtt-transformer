@@ -1,0 +1,16 @@
+
+title: mqtt-transformer
+description: >- # this means to ignore newlines until "baseurl:"
+  A simple service which consumes, transforms and periodically republish json messages on mqtt.
+
+# Build settings
+markdown: kramdown
+theme: jekyll-theme-slate
+plugins:
+  - jekyll-feed
+
+collections:
+  recipes:
+    output: true
+  tools:
+    output: true
