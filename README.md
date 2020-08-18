@@ -1,4 +1,5 @@
 [![Docker Build Status](https://img.shields.io/docker/cloud/build/tg44/mqtt-transformer?style=flat-square)](https://hub.docker.com/r/tg44/mqtt-transformer)
+[![Docs](https://img.shields.io/badge/Recipes-Documentation%20and%20examples-informational)](https://tg44.github.io/mqtt-transformer/)
 
 # MQTT TRANSFORMER
 
@@ -33,7 +34,7 @@ The required fields are; `toTopic`, `emitType`, and either `fromTopic` as a stri
 
 The `template` or `filterTemplate` parameter is the trickiest. The app uses [json-e](https://github.com/taskcluster/json-e) underneath, so you need to cook up a valid json-e transformation.
 Read [the docs](https://github.com/taskcluster/json-e#language-reference) for reference.
-(For concrete examples and use-cases; help me by opening an issue or PR. For minimal examples you can check the `conf/config.json`.)
+(For concrete examples and use-cases; check the [recipes](https://tg44.github.io/mqtt-transformer/) or help me by opening an issue or PR. For minimal examples you can check the `conf/config.json`.)
 
 
 ### Emit types

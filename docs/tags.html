@@ -1,6 +1,8 @@
 ---
 layout: default
 ---
+{% include breadcrumbs.html %}
+
 {% assign tags =  site.recipes | map: 'tags' | join: ','  | split: ',' | uniq | sort %}
 
 {% for tag in tags %}
