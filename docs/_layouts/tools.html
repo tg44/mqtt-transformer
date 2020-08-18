@@ -15,7 +15,7 @@ layout: default
   {% for recipe in site.recipes %}
   {% if recipe.tools contains slug %}
   <li>
-    <a href="{{ recipe.url }}">
+    <a href="{{ site.baseurl }}{{ recipe.url }}">
       {{ recipe.title }}
     </a>
   </li>

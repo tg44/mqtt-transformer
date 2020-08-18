@@ -7,7 +7,7 @@ layout: default
 
 <b>Tools:</b>
 {% for tool in page.tools %}
-<a class="tag" href="/tools/{{ tool | slugify }}">
+<a class="tag" href="{{ site.baseurl }}/tools/{{ tool | slugify }}">
     <span class="badge badge-info">
       {{ tool }}
     </span>
@@ -16,7 +16,7 @@ layout: default
 <br/>
 <b>Tags:</b>
 {% for tag in page.tags %}
-  <a class="tag" href="/tags/#{{ tag | slugify }}">
+  <a class="tag" href="{{ site.baseurl }}/tags#{{ tag | slugify }}">
     <span class="badge badge-secondary">
       {{ tag }}
     </span>
