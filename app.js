@@ -15,10 +15,21 @@ if(isVerbose) {
   console.info("Transformed config: " + JSON.stringify(config))
 }
 
+const mqttMatch = require('mqtt-match')
 const mqtt = require('mqtt')
 const mqttUrl = process.env.MQTT_URL || 'mqtt://localhost:1883'
 
-const client = mqtt.connect(mqttUrl)
+const mqttUser = process.env.MQTT_USER
+const mqttPassword = process.env.MQTT_PW
+const mqttClientId = process.env.MQTT_CLIENT_ID
+
+const additionalParams = {
+  username: mqttUser,
+  clientId: mqttClientId,
+  password: mqttPassword
+}
+
+const client = mqtt.connect(mqttUrl, additionalParams)
 
 const mqttData = new Map()
 const timerData = new Map()
@@ -35,14 +46,14 @@ client.on('connect', () => {
 })
 
 client.on('message', (topic, message) => {
-  const configs = config.transforms.filter(element => element.fromTopics.includes(topic));
+  const configs = config.transforms.filter(element => element.fromTopics.some(subscription => mqttMatch(subscription, topic)));
   let msg;
   try {
     msg = JSON.parse(message)
     if(isVerbose) {
       console.info("")
       console.info("Message from topic " + topic)
-      console.info("  parsed: " + JSON.stringify(config))
+      console.info("  parsed: " + JSON.stringify(config, null, 2))
     }
   } catch (error) {
     console.error('Json parse on topic ' + topic + ' message was; ' + message)
@@ -53,7 +64,7 @@ client.on('message', (topic, message) => {
     console.info("  Logic will run for " + configs.map(c => c.id))
   }
   configs.forEach( c => {
-    mqttData.set(c.id + topic, msg)
+    mqttData.set(c.id + c.fromTopics.find(subscription => mqttMatch(subscription, topic)), msg)
     evaluateTransformAndEmitLogic(c)
   })
 })

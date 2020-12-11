@@ -99,3 +99,5 @@ services:
 
 In the early config/template writing/testing phase, you can add the `IS_VERBOSE` env var too. 
 That will log all the incoming messages alongside with the rule id, the applied template, and the resulting output.
+
+`MQTT_USER`, `MQTT_PW`, `MQTT_CLIENT_ID` can be set as env vars too.
