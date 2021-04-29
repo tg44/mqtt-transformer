@@ -142,14 +142,18 @@ function mapAndEmitIfHasData(c) {
 
 function mapAndEmit(c, data) {
   try {
-    const out = jsone(c.template, data)
+    const content = typeof c.wrapper === 'string'
+      ? Object.defineProperty({}, c.wrapper, {value:data, enumerable:true})
+      : data;
+    const out = jsone(c.template, content)
+    const outJson = JSON.stringify(out);
     if(isVerbose) {
       console.info("  >>  " +c.id)
       console.info("      " + "Transform template " + JSON.stringify(c.template))
-      console.info("      " + "On " + JSON.stringify(data))
-      console.info("      " + "=> " + JSON.stringify(out))
+      console.info("      " + "On " + JSON.stringify(content))
+      console.info("      " + "=> " + outJson)
     }
-    client.publish(c.toTopic, JSON.stringify(out))
+    client.publish(c.toTopic, outJson)
   } catch (error) {
     console.error('Data parse error on id ' + c.id + ' template was; ' + JSON.stringify(c.template) + ' message was; ' + JSON.stringify(data))
     console.error(error);

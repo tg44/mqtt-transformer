@@ -43,6 +43,30 @@ Read [the docs](https://github.com/taskcluster/json-e#language-reference) for re
 
 Maps with the given `template`.
 
+Data may optionally be wrapped in a root object, which allows transformations on scalar values like strings and numbers.
+
+Example:
+`conf.json`:
+```json
+{
+  "transforms": [
+    {
+        "fromTopic": "test/value",
+        "toTopic": "test/transformed/value",
+        "emitType": "map",
+        "wrapper": "foo",
+        "template": {"$eval": "-foo"}
+    }
+  ]
+}
+```
+Result:
+```
+$ mosquitto_pub -t test/value -m '-42'
+$ mosquitto_sub -t test/transformed/value -v
+test/transformed/value 42
+```
+
 #### Filter - filter and collect
 
 Filters with the `filterTemplate`. The `filterTemplate` must return with true/false for correctly describe your intention.
@@ -69,7 +93,6 @@ ZipLast kinda works like zip. It waits till it gets at least one element in all 
 When it gets an element in each topic, it calls the `template`, emits the output, and clears all of the saved elements.
 
 The `template` will get a `{messages: []}` object, the indexes will match to the topic indexes.
-
 
 ## Running the app
 
