@@ -94,6 +94,7 @@ When it gets an element in each topic, it calls the `template`, emits the output
 
 The `template` will get a `{messages: []}` object, the indexes will match to the topic indexes.
 
+
 ## Running the app
 
 ### Local install / dev
