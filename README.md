@@ -36,36 +36,13 @@ The `template` or `filterTemplate` parameter is the trickiest. The app uses [jso
 Read [the docs](https://github.com/taskcluster/json-e#language-reference) for reference.
 (For concrete examples and use-cases; check the [recipes](https://tg44.github.io/mqtt-transformer/) or help me by opening an issue or PR. For minimal examples you can check the `conf/config.json`.)
 
-
 ### Emit types
 
 #### Transformation - map
 
 Maps with the given `template`.
 
-Data may optionally be wrapped in a root object, which allows transformations on scalar values like strings and numbers.
-
-Example:
-`conf.json`:
-```json
-{
-  "transforms": [
-    {
-        "fromTopic": "test/value",
-        "toTopic": "test/transformed/value",
-        "emitType": "map",
-        "wrapper": "foo",
-        "template": {"$eval": "-foo"}
-    }
-  ]
-}
-```
-Result:
-```
-$ mosquitto_pub -t test/value -m '-42'
-$ mosquitto_sub -t test/transformed/value -v
-test/transformed/value 42
-```
+Data may optionally be wrapped in a root object. This allows transformations on raw values like strings and numbers. The name of the value property in the root object is taken from the configuration parameter `wrapper`. Check the recipe _Power provided -> Power consumed_ for an example.
 
 #### Filter - filter and collect
 
