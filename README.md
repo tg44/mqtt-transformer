@@ -36,13 +36,14 @@ The `template` or `filterTemplate` parameter is the trickiest. The app uses [jso
 Read [the docs](https://github.com/taskcluster/json-e#language-reference) for reference.
 (For concrete examples and use-cases; check the [recipes](https://tg44.github.io/mqtt-transformer/) or help me by opening an issue or PR. For minimal examples you can check the `conf/config.json`.)
 
+
 ### Emit types
 
 #### Transformation - map
 
 Maps with the given `template`.
 
-Data may optionally be wrapped in a root object. This allows transformations on raw values like strings and numbers. The name of the value property in the root object is taken from the configuration parameter `wrapper`. Check the recipe _Power provided -> Power consumed_ for an example.
+Data may optionally be wrapped in a root object. This allows transformations on raw values like strings and numbers. The name of the value property in the root object is taken from the configuration parameter `wrapper`. Check the recipe _Power consumed -> Power provided_ for an example.
 
 #### Filter - filter and collect
 
@@ -51,6 +52,8 @@ Filters with the `filterTemplate`. The `filterTemplate` must return with true/fa
 
 Filter will emit the given message as is if the `filterTemplate` returns true, while collect will do a map on it with the `template`. 
 If the `filterTemplate` returns false it will not emit.
+
+Data may optionally be wrapped in a root object. This allows filtering of raw values like strings and numbers. The name of the value property in the root object is taken from the configuration parameter `wrapper`. Check the recipe _Power consumed -> Power provided_ for examples.
 
 #### Time driven types - repeat and once
 
