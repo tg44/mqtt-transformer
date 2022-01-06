@@ -30,7 +30,7 @@ The app works with one `conf.json` which looks like this;
 ```
 You can have multiple transforms in the array!
 
-The required fields are; `toTopic`, `emitType`, and either `fromTopic` as a string or `fromTopics` as an array of strings. The other fields may vary based on the choosen `emitType`.
+The required fields are; `toTopic` (or `toTopicTemplate` see below the templates), `emitType`, and either `fromTopic` as a string or `fromTopics` as an array of strings. The other fields may vary based on the choosen `emitType`.
 
 The `template` or `filterTemplate` parameter is the trickiest. The app uses [json-e](https://github.com/taskcluster/json-e) underneath, so you need to cook up a valid json-e transformation.
 Read [the docs](https://github.com/taskcluster/json-e#language-reference) for reference.
@@ -74,6 +74,20 @@ When it gets an element in each topic, it calls the `template`, emits the output
 
 The `template` will get a `{messages: []}` object, the indexes will match to the topic indexes.
 
+### Additional values 
+
+#### Topic
+You can add the `topicKeyToMessage` key to the config, and the incoming messages will be enchanced with the key and the topic name.
+```
+{
+    "fromTopic": "tele/+/STATE",
+    "toTopicTemplate": "${topic}_NEW",
+    "emitInterval": 60,
+    "topicKeyToMessage": "topic",
+    "emitType": "repeat",
+    "template": {"uptime": {"$eval": "UptimeSec"}, "topic": {"$eval": "topic"}}
+}
+```
 
 ## Running the app
 

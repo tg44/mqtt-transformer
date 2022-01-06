@@ -64,7 +64,12 @@ client.on('message', (topic, message) => {
     console.info("  Logic will run for " + configs.map(c => c.id))
   }
   configs.forEach( c => {
-    mqttData.set(c.id + c.fromTopics.find(subscription => mqttMatch(subscription, topic)), msg)
+    let enchancedMsg = msg
+    enchancedMsg = prepareTransformation(c, msg)
+    if(c.topicKeyToMessage && c.topicKeyToMessage.trim()){
+      enchancedMsg[c.topicKeyToMessage.trim()] = topic
+    }
+    mqttData.set(c.id + c.fromTopics.find(subscription => mqttMatch(subscription, topic)), enchancedMsg)
     evaluateTransformAndEmitLogic(c)
   })
 })
@@ -141,18 +146,32 @@ function mapAndEmitIfHasData(c) {
   }
 }
 
-function mapAndEmit(c, rawData) {
+function mapAndEmit(c, data) {
   try {
-    const data = prepareTransformation(c, rawData)
     const out = jsone(c.template, data)
     const outString = JSON.stringify(out)
+    let toTopic = c.toTopic
+    if(c.toTopicTemplate) {
+      try {
+        const calcedToTopic = jsone(c.toTopicTemplate, data)
+        toTopic = calcedToTopic || c.toTopic
+      } catch (error){
+        console.error('Data parse error on id ' + c.id + ' template was; ' + JSON.stringify(c.toTopicTemplate) + ' message was; ' + JSON.stringify(data))
+        console.error(error)
+      }
+    }
     if(isVerbose) {
       console.info("  >>  " + c.id)
       console.info("      " + "Transform template " + JSON.stringify(c.template))
       console.info("      " + "On " + JSON.stringify(data))
       console.info("      " + "=> " + outString)
+      console.info("      " + "to " + JSON.stringify(toTopic))
     }
-    client.publish(c.toTopic, outString)
+    if(!toTopic) {
+      console.error("toTopic is empty on " + c.id)
+    } else {
+      client.publish(toTopic, outString)
+    }
   } catch (error) {
     console.error('Data parse error on id ' + c.id + ' template was; ' + JSON.stringify(c.template) + ' message was; ' + JSON.stringify(data))
     console.error(error)

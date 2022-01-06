@@ -105,7 +105,7 @@ Our list to dos;
             "color":  {"$if": "value.Contact == 1",    "then": 10027161, "else": 10066176},
             "state":  {"$if": "value.Contact == 1",    "then": "opened", "else": "closed"},
             "icon":   {"$if": "value.Contact == 1",    "then": ":interrobang::unlock:", "else": ":lock:"},
-            "device": {"$if": "defined('value.Name')", "then": "${value.Name} (_${value.Device}_)", "else": "${value.Device}"}
+            "device": {"$if": "value['Name']", "then": "${value.Name} (_${value.Device}_)", "else": "${value.Device}"}
        },
        "in": {
          "embeds": [{

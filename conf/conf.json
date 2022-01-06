@@ -44,6 +44,14 @@
             "toTopic": "transformed/combineLatest",
             "emitType": "combineLatest",
             "template": {"uptimeDesk": "${messages[0].UptimeSec}", "uptimeWemos": "${messages[1].UptimeSec}", "sum": {"$eval": "messages[0].UptimeSec + messages[1].UptimeSec"}}
+        },
+        {
+            "fromTopic": "tele/+/STATE",
+            "toTopicTemplate": "${topic}_NEW",
+            "emitInterval": 60,
+            "topicKeyToMessage": "topic",
+            "emitType": "repeat",
+            "template": {"uptime": {"$eval": "UptimeSec"}, "topic": {"$eval": "topic"}}
         }
   ]
 }
