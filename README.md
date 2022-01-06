@@ -1,4 +1,6 @@
-[![Docker Build Status](https://img.shields.io/docker/cloud/build/tg44/mqtt-transformer?style=flat-square)](https://hub.docker.com/r/tg44/mqtt-transformer)
+[![Build](https://img.shields.io/github/workflow/status/tg44/mqtt-prometheus-message-exporter/ci)](https://github.com/tg44/mqtt-transformer/actions/workflows/build-and-publish.yaml)
+[![DockerImage](https://img.shields.io/badge/docker-latest-brightgreen?style=flat-square)](https://github.com/tg44/mqtt-transformer/pkgs/container/mqtt-transformer)
+[![Docker Hub](https://img.shields.io/docker/cloud/build/tg44/mqtt-transformer?style=flat-square)](https://hub.docker.com/r/tg44/mqtt-transformer)
 [![Docs](https://img.shields.io/badge/Recipes-Documentation%20and%20examples-informational)](https://tg44.github.io/mqtt-transformer/)
 
 # MQTT TRANSFORMER
@@ -100,14 +102,14 @@ For enable debugging you can  `export IS_VERBOSE=true`
 ### Docker and compose
 For docker you can run;
 ```
-docker run -e MQTT_URL="mqtt://myserver:1883" -v ${PWD}/conf:/home/node/app/conf tg44/mqtt-transformer
+docker run -e MQTT_URL="mqtt://myserver:1883" -v ${PWD}/conf:/home/node/app/conf ghcr.io/tg44/mqtt-transformer
 ```
 For docker compose;
 ```
 version: '3.1'
 services:
   mqtt-transformer:
-    image: tg44/mqtt-transformer
+    image: ghcr.io/tg44/mqtt-transformer
     restart: unless-stopped
     volumes:
       - /otp/mqtt-transformer/:/home/node/app/conf
@@ -119,3 +121,13 @@ In the early config/template writing/testing phase, you can add the `IS_VERBOSE`
 That will log all the incoming messages alongside with the rule id, the applied template, and the resulting output.
 
 `MQTT_USER`, `MQTT_PW`, `MQTT_CLIENT_ID` can be set as env vars too.
+
+
+## Breaking changes
+- 2022.01.06
+    - we will permanently move away from dockerhub, the latest images will be pushed, but the documentation and the other infos will only be updated here
+        - DH freezes the free builds, while GH-Actions not only build free, but gives us public repositories too
+
+
+## Contribution
+If you have any idea about the base functionality or the config/emitter syntax, just start a new issue/pr and we can talk about the use-cases, pros and cons!
