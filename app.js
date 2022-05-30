@@ -17,7 +17,7 @@ if(isVerbose) {
 
 const mqttMatch = require('mqtt-match')
 const mqtt = require('mqtt')
-const mqttUrl = process.env.MQTT_URL || 'mqtt://localhost:1883'
+const mqttUrl = process.env.MQTT_URL || 'mqtt://sigil.tg44.win:1883'
 
 const mqttUser = process.env.MQTT_USER
 const mqttPassword = process.env.MQTT_PW
@@ -50,6 +50,7 @@ client.on('message', (topic, message) => {
   let msg;
   try {
     msg = JSON.parse(message)
+    msg = fixupMessageForJsoneKeys(msg)
     if(isVerbose) {
       console.info("")
       console.info("Message from topic " + topic)
@@ -73,6 +74,22 @@ client.on('message', (topic, message) => {
     evaluateTransformAndEmitLogic(c)
   })
 })
+
+function fixupMessageForJsoneKeys(obj) {
+  if(typeof(obj) === 'object') {
+    if(Array.isArray(obj)) {
+      return obj.map(e => fixupMessageForJsoneKeys(e))
+    } else {
+      return Object.fromEntries(
+          Object.entries(obj).map(
+              ([k, v]) => [k.replaceAll("-","_"), fixupMessageForJsoneKeys(v)]
+          )
+      )
+    }
+  } else {
+    return obj
+  }
+}
 
 function evaluateTransformAndEmitLogic(c) {
   if(c.emitType === 'repeat') {
