@@ -94,7 +94,7 @@ You can add the `topicKeyToMessage` key to the config, and the incoming messages
 ## Running the app
 
 ### Local install / dev
-You need node 12, start with `npm i` and then `node app.js`.
+You need node 12, start with `npm i` and then `node app.ts`.
 For setting the mqtt server other than localhost you need to `export MQTT_URL="mqtt://myserver:1883"` before the service start.
 
 For enable debugging you can  `export IS_VERBOSE=true`

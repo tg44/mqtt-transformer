@@ -52,6 +52,11 @@
             "topicKeyToMessage": "topic",
             "emitType": "repeat",
             "template": {"uptime": {"$eval": "UptimeSec"}, "topic": {"$eval": "topic"}}
+        },
+        {
+          "emitType": "constant",
+          "name": "secToHour",
+          "value": 3600
         }
   ]
 }
