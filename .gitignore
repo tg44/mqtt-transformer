@@ -5,3 +5,4 @@ node_modules
 *-ti.ts
 .nyc_output
 coverage
+.DS_Store

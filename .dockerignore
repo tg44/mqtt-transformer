@@ -4,3 +4,4 @@ node_modules
 conf/*.json
 .nyc_output
 coverage
+.DS_Store

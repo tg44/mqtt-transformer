@@ -6,6 +6,6 @@ COPY package*.json ./
 RUN npm install
 USER node
 COPY --chown=node:node . .
-RUN npx tsc
+RUN npm run build
 
 CMD [ "node", "build/app.js" ]
