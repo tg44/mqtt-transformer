@@ -55,7 +55,7 @@ Based on the [documentation](https://discord.com/developers/docs/resources/webho
 ]}
 ```
 
-#### mqttwarn
+#### mqttwarn - old method
 This is rather easy too. Our output topic will be `transformed/alert/door-window` and we will provide the jsonBody as is.
 
 ```ini
@@ -66,8 +66,22 @@ targets = {
           'discord'    : [ "post", "https://discord.com/api/webhooks/<<id>>/<<otherId>>", None, None, True ]
           }
 
-[transformed/alert/door-window]
+[discord1/send]
 targets = http:discord, log:info
+```
+
+#### hookCall - new method
+```json
+    {
+      "io": [
+        {
+          "type": "hookCall",
+          "url": "https://discord.com/api/webhooks/<<id>>/<<otherId>>",
+          "topicPrefix": "discord1/",
+          "responseTopic": "computed/hooks/discord1/response"
+        }
+      ]
+    }
 ```
 
 #### Transformer
@@ -80,7 +94,7 @@ Our list to dos;
 ```json
 {
  "fromTopic": "tele/+/+/SENSOR",
- "toTopic": "transformed/alert/door-window",
+ "toTopic": "discord1/send",
  "emitType": "collect",
  "filterTemplate": {
     "$let": {
