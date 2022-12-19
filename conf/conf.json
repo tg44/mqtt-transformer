@@ -1,62 +1,134 @@
 {
+  "io": [
+    {
+      "type": "webserver",
+      "topicPrefix": "ws/",
+      "port": 3000
+    },
+    {
+      "type": "mqtt",
+      "topicPrefix": "",
+      "url": "mqtt://localhost:1883"
+    },
+    {
+      "type": "hookCall",
+      "url": "http://localhost:3000/hook",
+      "topicPrefix": "hook/",
+      "responseTopic": "computed/hooks/response1"
+    }
+  ],
   "transforms": [
     {
-            "fromTopic": "export/crypto",
-            "toTopic": "transformed/crypto-repeat",
-            "emitInterval": 60,
-            "emitType": "repeat",
-            "template": {"message": "BTC ${bitcoin.usd}  ETH ${ethereum.usd}"}
-        },
-        {
-            "fromTopic": "export/crypto",
-            "toTopic": "transformed/crypto-once",
-            "emitInterval": 60,
-            "emitType": "once",
-            "template": {"message": "BTC ${bitcoin.usd}  ETH ${ethereum.usd}"}
-        },
-        {
-            "fromTopic": "tele/sp-desk/STATE",
-            "toTopic": "transformed/sp-desk-state",
-            "emitType": "map",
-            "template": {"uptime": {"$eval": "UptimeSec"}}
-        },
-        {
-            "fromTopic": "tele/wemos-dev/SENSOR",
-            "toTopic": "transformed/wemos-dev/filter",
-            "emitType": "filter",
-            "filterTemplate": {"$if": "TSL2561.Illuminance < 3", "then": true, "else": false}
-        },
-        {
-            "fromTopic": "tele/wemos-dev/SENSOR",
-            "toTopic": "transformed/wemos-dev/collect",
-            "emitType": "collect",
-            "filterTemplate": {"$if": "TSL2561.Illuminance < 3", "then": true, "else": false},
-            "template": {"time": "${Time}"}
-        },
-        {
-            "fromTopics": ["tele/sp-desk/STATE", "tele/wemos-dev/STATE"],
-            "toTopic": "transformed/zip",
-            "emitType": "zipLast",
-            "template": {"uptimeDesk": "${messages[0].UptimeSec}", "uptimeWemos": "${messages[1].UptimeSec}", "sum": {"$eval": "messages[0].UptimeSec + messages[1].UptimeSec"}}
-        },
-        {
-            "fromTopics": ["tele/sp-desk/STATE", "tele/wemos-dev/STATE"],
-            "toTopic": "transformed/combineLatest",
-            "emitType": "combineLatest",
-            "template": {"uptimeDesk": "${messages[0].UptimeSec}", "uptimeWemos": "${messages[1].UptimeSec}", "sum": {"$eval": "messages[0].UptimeSec + messages[1].UptimeSec"}}
-        },
-        {
-            "fromTopic": "tele/+/STATE",
-            "toTopicTemplate": "${topic}_NEW",
-            "emitInterval": 60,
-            "topicKeyToMessage": "topic",
-            "emitType": "repeat",
-            "template": {"uptime": {"$eval": "UptimeSec"}, "topic": {"$eval": "topic"}}
-        },
-        {
-          "emitType": "constant",
-          "name": "secToHour",
-          "value": 3600
+      "fromTopic": "ws/test1",
+      "toTopic": "computed/test1",
+      "emitInterval": 30,
+      "emitType": "repeat",
+      "template": {
+        "message": "${stringParam}"
+      }
+    },
+    {
+      "fromTopic": "computed/test1",
+      "toTopic": "hook/test2",
+      "emitInterval": 60,
+      "emitType": "once",
+      "template": {
+        "message": "${message}"
+      }
+    },
+    {
+      "fromTopic": "computed/hooks/response1",
+      "toTopic": "computed/map",
+      "emitType": "map",
+      "template": {
+        "responseStatus": {
+          "$eval": "responseStatus"
         }
+      }
+    },
+    {
+      "fromTopic": "computed/hooks/response1",
+      "toTopic": "computed/filter/ok",
+      "emitType": "filter",
+      "filterTemplate": {
+        "$if": "responseStatus == 200",
+        "then": true,
+        "else": false
+      }
+    },
+    {
+      "fromTopic": "computed/hooks/response1",
+      "toTopic": "computed/filter/nok",
+      "emitType": "filter",
+      "filterTemplate": {
+        "$if": "responseStatus != 200",
+        "then": true,
+        "else": false
+      }
+    },
+    {
+      "fromTopic": "computed/hooks/response1",
+      "toTopic": "computed/collect/ok",
+      "emitType": "collect",
+      "filterTemplate": {
+        "$if": "responseStatus == 200",
+        "then": true,
+        "else": false
+      },
+      "template": {
+        "request": "${requestBody}"
+      }
+    },
+    {
+      "fromTopics": [
+        "ws/test1",
+        "ws/test2"
+      ],
+      "toTopic": "computed/zip",
+      "emitType": "zipLast",
+      "template": {
+        "firstNum": "${messages[0].numParam}",
+        "secondNum": "${messages[1].numParam}",
+        "sum": {
+          "$eval": "messages[0].numParam + messages[1].numParam"
+        }
+      }
+    },
+    {
+      "fromTopics": [
+        "ws/test1",
+        "ws/test2"
+      ],
+      "toTopic": "computed/combineLatest",
+      "emitType": "combineLatest",
+      "template": {
+        "firstNum": "${messages[0].numParam}",
+        "secondNum": "${messages[1].numParam}",
+        "sum": {
+          "$eval": "messages[0].numParam + messages[1].numParam"
+        }
+      }
+    },
+    {
+      "fromTopic": "computed/filter/+",
+      "toTopicTemplate": "f_${topic}_NEW",
+      "emitInterval": 60,
+      "topicKeyToMessage": "topic",
+      "emitType": "map",
+      "useConstants": {
+        "sth": "secToHour"
+      },
+      "template": {
+        "responseStatus": {
+          "$eval": "responseStatus"
+        },
+        "secToHour": "${sth}"
+      }
+    },
+    {
+      "emitType": "constant",
+      "name": "secToHour",
+      "value": 3600
+    }
   ]
 }

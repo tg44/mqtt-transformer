@@ -13,21 +13,28 @@ Use-case;
  - you own some mqtt displayers (for ex. services, or physical devices)
  - the emitters and the displayers are not compatible out of the box
  - you need some bridge to convert the messages
+ - you want to do some simple http->mqtt or mqtt->http transforms/bridging
  
 ## Config syntax
 
 The app works with one `conf.json` which looks like this;
-```
+
+```json
 {
   "transforms": [
     {
-        "fromTopic": "tele/tasmota/STATE",
-        "toTopic": "transformed/tasmota-state",
-        "emitInterval": 60,
-        "emitType": "repeat",
-        "template": {"uptime": {"$eval": "UptimeSec"}}
+      "fromTopic": "tele/tasmota/STATE",
+      "toTopic": "transformed/tasmota-state",
+      "emitInterval": 60,
+      "emitType": "repeat",
+      "template": {
+        "uptime": {
+          "$eval": "UptimeSec"
+        }
+      }
     }
-  ]
+  ],
+  "io": []
 }
 ```
 You can have multiple transforms in the array!
@@ -39,7 +46,7 @@ Read [the docs](https://github.com/taskcluster/json-e#language-reference) for re
 (For concrete examples and use-cases; check the [recipes](https://tg44.github.io/mqtt-transformer/) or help me by opening an issue or PR. For minimal examples you can check the `conf/config.json`.)
 
 
-### Emit types
+### Emit types - "transforms"
 
 #### Transformation - map
 
@@ -76,10 +83,34 @@ When it gets an element in each topic, it calls the `template`, emits the output
 
 The `template` will get a `{messages: []}` object, the indexes will match to the topic indexes.
 
+#### Constants
+
+You can add commonly used constants as a "transformation".
+For usage you need to add the `useConstants` as an optional parameter, and you can rename the constant there `newName: constantName`.
+
+The defined name will be written to the input data before the transformations, so it could potentially override values from the incoming data!
+
+```json
+  [
+    {
+      "emitType": "constant",
+      "name": "secToHour",
+      "value": 3600
+    },
+    {
+        "emitType": "map",
+        "fromTopic": "t",
+        "toTopic": "out",
+        "template": {"message": "we have  ${sTh} secs in on hour"},
+        "useConstants": {"sTh": "secToHour"}
+    }
+  ]  
+```
+
 ### Additional values 
 
 #### Topic
-You can add the `topicKeyToMessage` key to the config, and the incoming messages will be enchanced with the key and the topic name.
+You can add the `topicKeyToMessage` key to the config, and the incoming messages will be enhanced with the key and the topic name.
 ```
 {
     "fromTopic": "tele/+/STATE",
@@ -90,14 +121,68 @@ You can add the `topicKeyToMessage` key to the config, and the incoming messages
     "template": {"uptime": {"$eval": "UptimeSec"}, "topic": {"$eval": "topic"}}
 }
 ```
+(If the message has the topic `tele/test/STATE`, the above example will produce messages to the `tele/test/STATE_NEW` topic.)
+
+### IOs
+The app by default uses the env params as an mqtt connection. But it could bridge multiple mqtt and/or webservers.
+
+All the ios has a type (see below) and a `topicPrefix` which is optional.
+The prefix could help on the routings, like if you have two mqtt servers, you can add the prefix as `mqtt1/` and `mqtt2/` respectively,
+and can bridge the messages from `mqtt1/test` to `mqtt2/test`.
+The empty topicPrefix will get ALL the messages! (So if you have 3 mqtt servers `""` will get all the messages and `"first/"` will get `"first/second"` messages if you prefix them in the same order. 
+We are using the `topicPrefix` only for routing, it will be dropped from the topic name before delivery.
+
+#### MQTT
+```json
+    {
+      "type": "mqtt",
+      "topicPrefix": "",
+      "url": "mqtt://localhost:1883",
+      "user": "optional string",
+      "password": "optional string",
+      "clientId": "optional string"
+    }
+```
+
+Gets and sends messages from/to mqtt topics.
+
+#### Webserver
+```json
+    {
+      "type": "webserver",
+      "topicPrefix": "ws/",
+      "port": 3000
+    }
+```
+Starts a webserver on the given port.
+The command; 
+`curl -d '{"stringParam":"stringValue", "numParam": 5}' -H "Content-Type: application/json" -X POST localhost:3000/test1`
+Will fire the `ws/test1` from topics, with the given json in the body. (Only handles POST requests.)
+
+#### HookCall
+```json
+    {
+      "type": "hookCall",
+      "url": "http://localhost:3000/hook",
+      "topicPrefix": "hook/",
+      "responseTopic": "computed/hooks/response1"
+    }
+```
+Calls the given hook url. Optionally writes the response to a `responseTopic`.
 
 ## Running the app
 
 ### Local install / dev
-You need node 12, start with `npm i` and then `node app.ts`.
-For setting the mqtt server other than localhost you need to `export MQTT_URL="mqtt://myserver:1883"` before the service start.
-
 For enable debugging you can  `export IS_VERBOSE=true`
+
+```shell
+npm i
+docker-compose up -d
+ts-node-dev --respawn --watch src src/app.ts
+# from other consoles 
+curl -d '{"stringParam":"stringValue", "numParam": 5}' -H "Content-Type: application/json" -X POST localhost:3000/test1
+curl -d '{"stringParam":"stringValue", "numParam": 7}' -H "Content-Type: application/json" -X POST localhost:3000/test2 
+```
 
 ### Docker and compose
 For docker you can run;

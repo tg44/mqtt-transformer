@@ -1,5 +1,5 @@
 import { suite, test } from '@testdeck/mocha';
-import {parseConfig} from "../src/parser";
+import {parseTransforms} from "../src/parser";
 import chai from 'chai';
 import fs from "fs";
 chai.should();
@@ -8,6 +8,6 @@ chai.should();
     @test 'should be backward compatible'() {
         const rawdata = fs.readFileSync('conf/conf.json').toString();
         const config = JSON.parse(rawdata);
-        parseConfig(config,false).should.be.not.undefined
+        parseTransforms(config,false).should.be.not.undefined
     }
 }

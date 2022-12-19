@@ -1,6 +1,6 @@
 import jsone from "json-e";
 import {CollectOps, TransformationOps, FilterOps, OnceOps, RepeatOps, AllSupportedOps} from "./types";
-import {PublishFunc} from "./mqtt";
+import {PublishFunc} from "./handleMessage";
 
 export const evaluateTransformAndEmitLogic = (c: AllSupportedOps, mqttData: Map<string, any>, timerData: Map<number, object>, mqttPublish: PublishFunc, isVerbose: boolean) => {
     if(c.emitType === 'repeat') {

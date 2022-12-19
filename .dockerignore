@@ -5,3 +5,4 @@ conf/*.json
 .nyc_output
 coverage
 .DS_Store
+logs

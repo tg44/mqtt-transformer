@@ -1,7 +1,7 @@
 import { suite, test } from '@testdeck/mocha';
 import chai from 'chai';
 import {ConstantDef, MapOps} from "../src/types";
-import {handleMessage} from "../src/mqtt";
+import {handleMessage} from "../src/handleMessage";
 chai.should();
 
 @suite class HandleMessageTest {
@@ -23,7 +23,7 @@ chai.should();
         };
         const d = {k: {i: 5}}
         const str = JSON.stringify(d)
-        handleMessage("t", Buffer.from(str, "utf-8"), [mapOps], [], data, timerData, mqttPublish, false)
+        handleMessage("t", str, [mapOps], [], data, timerData, mqttPublish, false)
 
         dataOut.should.be.eql([{topic: "out", message: "{\"message\":\"I 5\"}"}])
     }
@@ -61,7 +61,7 @@ chai.should();
         };
         const d = {k: {i: 5}}
         const str = JSON.stringify(d)
-        handleMessage("t", Buffer.from(str, "utf-8"), [mapOps], constants, data, timerData, mqttPublish, false)
+        handleMessage("t", str, [mapOps], constants, data, timerData, mqttPublish, false)
 
         dataOut.should.be.eql([{topic: "out", message: "{\"message\":\"I 5, 1, 4\"}"}])
     }
