@@ -5,7 +5,7 @@ import {initMqtt} from "./io/mqtt"
 import {initWebserver} from "./io/webserver";
 import {handleMessage, PublishFunc} from "./handleMessage";
 import {initHookCall} from "./io/hookCall";
-import {AllSupportedIOs, AllSupportedOps, ConstantDef} from "./types";
+import {AllSupportedIOs, AllSupportedOps, ConstantDef, MetricsData} from "./types";
 import {createCheckers} from "ts-interface-checker";
 import typesTi from "./types-ti";
 
@@ -26,6 +26,7 @@ const constants: ConstantDef[] = ops.filter((c): c is ConstantDef => ConstantDef
 
 const mqttData = new Map()
 const timerData = new Map()
+const metricsData: Map<string, MetricsData> = new Map()
 const publishers: {io: AllSupportedIOs, publisher?: PublishFunc}[] = []
 
 const globalPublisher = (topic: string, message: string) => {
@@ -43,7 +44,8 @@ const globalPublisher = (topic: string, message: string) => {
 }
 
 const globalHandler = (topic: string, message: string) => {
-  handleMessage(topic, message, transforms, constants, mqttData, timerData, globalPublisher, isVerbose)
+  const now = new Date().getTime()
+  handleMessage(topic, message, now, transforms, constants, mqttData, timerData, metricsData, globalPublisher, isVerbose)
 }
 
 ios.forEach(io => {

@@ -40,9 +40,21 @@
       "fromTopic": "computed/hooks/response1",
       "toTopic": "computed/map",
       "emitType": "map",
+      "useMetrics": {
+        "lT": "lastMessageTime",
+        "fT": "firstMessageTime",
+        "pT": "prevMessageTime",
+        "mC": "messageCount"
+      },
       "template": {
         "responseStatus": {
           "$eval": "responseStatus"
+        },
+        "avgMsgPerSec": {
+          "$eval": "floor((lT-fT)/mC/1000)"
+        },
+        "msgDelay": {
+          "$eval": "floor((lT-pT)/1000)"
         }
       }
     },

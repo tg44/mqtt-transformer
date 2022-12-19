@@ -16,6 +16,7 @@ interface Transformation {
     emitType: EmitType,
     wrapper?: string,
     useConstants?: object,
+    useMetrics?: object,
 }
 
 export type TransformationOps = RepeatOps | OnceOps | MapOps | CollectOps | ZipLastOps | CombineLatestOps
@@ -86,4 +87,11 @@ export interface MqttIO extends InputOutput{
     user?: string,
     password?: string,
     clientId?: string,
+}
+
+export interface MetricsData {
+    firstMessageTime: number,
+    prevMessageTime: number,
+    lastMessageTime: number,
+    messageCount: number,
 }

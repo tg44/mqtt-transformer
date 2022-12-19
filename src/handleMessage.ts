@@ -1,16 +1,19 @@
-import {AllSupportedOps, ConstantDef} from "./types";
+import {AllSupportedOps, ConstantDef, MetricsData} from "./types";
 import mqttMatch from "mqtt-match";
 import {evaluateTransformAndEmitLogic} from "./operators";
+import {hasKey} from "./utils";
 
 export type PublishFunc = (topic: string, message: string) => void
 
 export const handleMessage = (
     topic: string,
     message: string,
+    time: number,
     transforms: AllSupportedOps[],
     constants: ConstantDef[],
     mqttData: Map<string, any>,
     timerData: Map<number, object>,
+    metricsData: Map<string, MetricsData>,
     publisher: PublishFunc,
     isVerbose: boolean
 ) => {
@@ -49,9 +52,36 @@ export const handleMessage = (
         }
         if(topicMatcher) {
             mqttData.set(c.id + topicMatcher, enchancedMsg)
+            if(c.useMetrics) {
+                const metrics = updateMetricsData(metricsData, c.id + topicMatcher, time)
+                Object.entries(c.useMetrics).forEach(([k, v]) => {
+                    if(typeof v === 'string' && hasKey(metrics, v)) {
+                        enchancedMsg[k] = metrics[v]
+                    }
+                })
+            }
         }
         evaluateTransformAndEmitLogic(c, mqttData, timerData, publisher, isVerbose)
     })
+}
+
+function updateMetricsData(metricsData: Map<string, MetricsData>, topic: string, time: number): MetricsData {
+    const d = metricsData.get(topic)
+    if(d) {
+        d.prevMessageTime = d.lastMessageTime
+        d.lastMessageTime = time
+        d.messageCount += 1
+        return d
+    } else {
+        const nd = {
+            firstMessageTime: time,
+            lastMessageTime: time,
+            prevMessageTime: time,
+            messageCount: 1,
+        }
+        metricsData.set(topic, nd)
+        return nd
+    }
 }
 
 
