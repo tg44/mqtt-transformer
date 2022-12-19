@@ -1,4 +1,5 @@
 type EmitType = 'constant' | 'repeat' | 'once' | 'map' | 'filter' | 'collect' | 'zipLast' | 'combineLatest'
+type IOType = 'webserver' | 'mqtt' | 'hookCall'
 
 interface Transformer {
     template: object,
@@ -20,6 +21,7 @@ interface Transformation {
 export type TransformationOps = RepeatOps | OnceOps | MapOps | CollectOps | ZipLastOps | CombineLatestOps
 export type AllSupportedOps = FilterOps | TransformationOps
 export type AllSupportedConfigs = ConstantDef | AllSupportedOps
+export type AllSupportedIOs = MqttIO | HookCallIO | WebserverIO
 
 export interface ConstantDef {
     emitType: "constant",
@@ -59,3 +61,29 @@ export interface CombineLatestOps extends Transformation, Transformer {
     defaultValues?: any[],
 }
 
+export interface InputOutput {
+    id: number,
+    type: IOType,
+    topicPrefix?: string,
+}
+
+export interface WebserverIO extends InputOutput{
+    type: "webserver",
+    port: number,
+}
+
+
+export interface HookCallIO extends InputOutput{
+    type: "hookCall",
+    url: string,
+    headers?: [string, string][],
+    responseTopic?: string,
+}
+
+export interface MqttIO extends InputOutput{
+    type: "mqtt",
+    url: string,
+    user?: string,
+    password?: string,
+    clientId?: string,
+}
