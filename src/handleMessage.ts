@@ -38,21 +38,29 @@ export const handleMessage = (
     configs.forEach( c => {
         let enchancedMsg = msg
         enchancedMsg = prepareTransformation(c, msg)
-        if(c.topicKeyToMessage && c.topicKeyToMessage.trim()){
+        const messageIsObject = typeof enchancedMsg === 'object' && !Array.isArray(enchancedMsg) && enchancedMsg !== null
+        if(isVerbose && !messageIsObject && (c.topicKeyToMessage || c.useConstants || c.useMetrics)) {
+            console.warn(`topicKeyToMessage, useConstants and useMetrics needs scalar values to be wrapped! ${c.id}`)
+        }
+        if(messageIsObject && c.topicKeyToMessage && c.topicKeyToMessage.trim()){
             enchancedMsg[c.topicKeyToMessage.trim()] = topic
         }
-        const topicMatcher = c.fromTopics.find(subscription => mqttMatch(subscription, topic))
+        const additionalConstants: {[key: string]: any} = {}
         if(c.useConstants) {
             Object.entries(c.useConstants).forEach(([k, v]) => {
                 const t = constants.find(cons => cons.name === v)
                 if(t) {
-                    enchancedMsg[k] = t.value
+                    additionalConstants[k] = t.value
+                    if(messageIsObject) {
+                        enchancedMsg[k] = t.value
+                    }
                 }
             })
         }
+        const topicMatcher = c.fromTopics.find(subscription => mqttMatch(subscription, topic))
         if(topicMatcher) {
             mqttData.set(c.id + topicMatcher, enchancedMsg)
-            if(c.useMetrics) {
+            if(messageIsObject && c.useMetrics) {
                 const metrics = updateMetricsData(metricsData, c.id + topicMatcher, time)
                 Object.entries(c.useMetrics).forEach(([k, v]) => {
                     if(typeof v === 'string' && hasKey(metrics, v)) {
@@ -61,7 +69,7 @@ export const handleMessage = (
                 })
             }
         }
-        evaluateTransformAndEmitLogic(c, mqttData, timerData, publisher, isVerbose)
+        evaluateTransformAndEmitLogic(c, mqttData, timerData, additionalConstants, publisher, isVerbose)
     })
 }
 

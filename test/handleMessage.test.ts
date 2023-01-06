@@ -1,6 +1,6 @@
 import { suite, test } from '@testdeck/mocha';
 import chai from 'chai';
-import {ConstantDef, MapOps} from "../src/types";
+import {CombineLatestOps, ConstantDef, MapOps} from "../src/types";
 import {handleMessage} from "../src/handleMessage";
 chai.should();
 
@@ -66,6 +66,42 @@ chai.should();
         handleMessage("t", str, 0, [mapOps], constants, data, timerData, metrics, mqttPublish, false)
 
         dataOut.should.be.eql([{topic: "out", message: "{\"message\":\"I 5, 1, 4\"}"}])
+    }
+
+    @test 'should handle constants with raw data'() {
+        const ops: CombineLatestOps = {
+            emitType: "combineLatest",
+            id: 1,
+            fromTopics: ["t1", "t2"],
+            //topicKeyToMessage?: string,
+            toTopicTemplate: "out",
+            //wrapper?: string,
+            template: {"message": "I ${messages[0]}, ${messages[1]}, ${f}"},
+            useConstants: {"f": "a"}
+        }
+        const constants: ConstantDef[] = [
+            {
+                emitType: "constant",
+                id: 1,
+                name: "a",
+                value: 1,
+            }
+        ]
+        const timerData = new Map()
+        const data = new Map()
+        const metrics = new Map()
+        const dataOut = []
+        const mqttPublish = (topic: string, message: string) => {
+            dataOut.push({topic, message})
+        };
+        const d1 = 14
+        const d2 = 76
+        const str1 = JSON.stringify(d1)
+        const str2 = JSON.stringify(d2)
+        handleMessage("t1", str1, 0, [ops], constants, data, timerData, metrics, mqttPublish, false)
+        handleMessage("t2", str2, 0, [ops], constants, data, timerData, metrics, mqttPublish, false)
+
+        dataOut.should.be.eql([{topic: "out", message: "{\"message\":\"I 14, 76, 1\"}"}])
     }
 
 
