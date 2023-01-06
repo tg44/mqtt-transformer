@@ -25,22 +25,22 @@ chai.should();
         }
 
 
-        evaluateTransformAndEmitLogic(combineLatestOps, data, timerData, mqttPublish, false)
+        evaluateTransformAndEmitLogic(combineLatestOps, data, timerData, {}, mqttPublish, false)
         dataOut.should.be.eql([{topic: "out", message: "{\"message\":\"2 4\"}"}])
         dataOut.pop()
 
         data.set("1t1", {k: {i: 3}})
-        evaluateTransformAndEmitLogic(combineLatestOps, data, timerData, mqttPublish, false)
+        evaluateTransformAndEmitLogic(combineLatestOps, data, timerData, {}, mqttPublish, false)
         dataOut.should.be.eql([{topic: "out", message: "{\"message\":\"3 4\"}"}])
         dataOut.pop()
 
         data.set("1t1", {k: {i: 9}})
-        evaluateTransformAndEmitLogic(combineLatestOps, data, timerData, mqttPublish, false)
+        evaluateTransformAndEmitLogic(combineLatestOps, data, timerData, {}, mqttPublish, false)
         dataOut.should.be.eql([{topic: "out", message: "{\"message\":\"9 4\"}"}])
         dataOut.pop()
 
         data.set("1t2", {k: {i: 6}})
-        evaluateTransformAndEmitLogic(combineLatestOps, data, timerData, mqttPublish, false)
+        evaluateTransformAndEmitLogic(combineLatestOps, data, timerData, {}, mqttPublish, false)
         dataOut.should.be.eql([{topic: "out", message: "{\"message\":\"9 6\"}"}])
         dataOut.pop()
     }
@@ -65,22 +65,22 @@ chai.should();
         }
 
 
-        evaluateTransformAndEmitLogic(combineLatestOps, data, timerData, mqttPublish, false)
+        evaluateTransformAndEmitLogic(combineLatestOps, data, timerData, {}, mqttPublish, false)
         dataOut.should.be.eql([{topic: "out", message: "{\"message\":\"2 4\"}"}])
         dataOut.pop()
 
         data.set("1t1", {k: {i: 3}})
-        evaluateTransformAndEmitLogic(combineLatestOps, data, timerData, mqttPublish, false)
+        evaluateTransformAndEmitLogic(combineLatestOps, data, timerData, {}, mqttPublish, false)
         dataOut.should.be.eql([{topic: "out", message: "{\"message\":\"3 4\"}"}])
         dataOut.pop()
 
         data.set("1t1", {k: {i: 9}})
-        evaluateTransformAndEmitLogic(combineLatestOps, data, timerData, mqttPublish, false)
+        evaluateTransformAndEmitLogic(combineLatestOps, data, timerData, {}, mqttPublish, false)
         dataOut.should.be.eql([{topic: "out", message: "{\"message\":\"9 4\"}"}])
         dataOut.pop()
 
         data.set("1t2", {k: {i: 6}})
-        evaluateTransformAndEmitLogic(combineLatestOps, data, timerData, mqttPublish, false)
+        evaluateTransformAndEmitLogic(combineLatestOps, data, timerData, {}, mqttPublish, false)
         dataOut.should.be.eql([{topic: "out", message: "{\"message\":\"9 6\"}"}])
         dataOut.pop()
     }

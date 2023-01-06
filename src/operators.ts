@@ -2,7 +2,7 @@ import jsone from "json-e";
 import {CollectOps, TransformationOps, FilterOps, OnceOps, RepeatOps, AllSupportedOps} from "./types";
 import {PublishFunc} from "./handleMessage";
 
-export const evaluateTransformAndEmitLogic = (c: AllSupportedOps, mqttData: Map<string, any>, timerData: Map<number, object>, mqttPublish: PublishFunc, isVerbose: boolean) => {
+export const evaluateTransformAndEmitLogic = (c: AllSupportedOps, mqttData: Map<string, any>, timerData: Map<number, object>, additionalConstants: object, mqttPublish: PublishFunc, isVerbose: boolean) => {
     if(c.emitType === 'repeat') {
         if(!timerData.get(c.id)) {
             mapAndEmitIfHasData(c, mqttData, mqttPublish, isVerbose)
@@ -28,13 +28,13 @@ export const evaluateTransformAndEmitLogic = (c: AllSupportedOps, mqttData: Map<
     } else if(c.emitType === 'zipLast') {
         const allData = gatherAllData(c, mqttData)
         if(hasAllDataPredicate(c, allData)){
-            mapAndEmit(c, {messages: allData}, mqttPublish, isVerbose)
+            mapAndEmit(c, {...additionalConstants, ...{messages: allData}}, mqttPublish, isVerbose)
             c.fromTopics.forEach(topic => mqttData.delete(c.id + topic))
         }
     } else if(c.emitType === 'combineLatest') {
         const allData = gatherAllData(c, mqttData)
         if(hasAllDataPredicate(c, allData)){
-            mapAndEmit(c, {messages: allData}, mqttPublish, isVerbose)
+            mapAndEmit(c, {...additionalConstants, ...{messages: allData}}, mqttPublish, isVerbose)
         }
     } else {
         // @ts-ignore

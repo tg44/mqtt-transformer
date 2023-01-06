@@ -25,20 +25,20 @@ chai.should();
         }
 
 
-        evaluateTransformAndEmitLogic(zipLastOps, data, timerData, mqttPublish, false)
+        evaluateTransformAndEmitLogic(zipLastOps, data, timerData, {}, mqttPublish, false)
         dataOut.should.be.eql([{topic: "out", message: "{\"message\":\"2 4\"}"}])
         dataOut.pop()
 
         data.set("1t1", {k: {i: 3}})
-        evaluateTransformAndEmitLogic(zipLastOps, data, timerData, mqttPublish, false)
+        evaluateTransformAndEmitLogic(zipLastOps, data, timerData, {}, mqttPublish, false)
         dataOut.should.be.empty
 
         data.set("1t1", {k: {i: 9}})
-        evaluateTransformAndEmitLogic(zipLastOps, data, timerData, mqttPublish, false)
+        evaluateTransformAndEmitLogic(zipLastOps, data, timerData, {}, mqttPublish, false)
         dataOut.should.be.empty
 
         data.set("1t2", {k: {i: 6}})
-        evaluateTransformAndEmitLogic(zipLastOps, data, timerData, mqttPublish, false)
+        evaluateTransformAndEmitLogic(zipLastOps, data, timerData, {}, mqttPublish, false)
         dataOut.should.be.eql([{topic: "out", message: "{\"message\":\"9 6\"}"}])
         dataOut.pop()
     }

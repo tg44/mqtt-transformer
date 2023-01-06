@@ -25,12 +25,12 @@ chai.should();
         }
 
 
-        evaluateTransformAndEmitLogic(collectOps, data, timerData, mqttPublish, false)
+        evaluateTransformAndEmitLogic(collectOps, data, timerData, {}, mqttPublish, false)
         dataOut.should.be.eql([{topic: "out", message: "{\"message\":\"I 2\"}"}])
 
         dataOut.pop()
         data.set("1t", {k: {i: 7}})
-        evaluateTransformAndEmitLogic(collectOps, data, timerData, mqttPublish, false)
+        evaluateTransformAndEmitLogic(collectOps, data, timerData, {}, mqttPublish, false)
         dataOut.should.be.eql([])
     }
 

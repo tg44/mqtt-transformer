@@ -24,7 +24,7 @@ chai.should();
         }
 
 
-        evaluateTransformAndEmitLogic(mapOps, data, timerData, mqttPublish, false)
+        evaluateTransformAndEmitLogic(mapOps, data, timerData, {}, mqttPublish, false)
 
         dataOut.should.be.eql([{topic: "out", message: "{\"message\":\"I 5\"}"}])
     }
