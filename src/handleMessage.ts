@@ -5,6 +5,24 @@ import {hasKey} from "./utils";
 
 export type PublishFunc = (topic: string, message: string) => void
 
+export const parseMessage = (message: string, topic: string, configs: AllSupportedOps[], isVerbose: boolean): undefined | Record<string,any> => {
+    let msg: any;
+    try {
+        msg = JSON.parse(message)
+        msg = fixupMessageForJsoneKeys(msg)
+        if(isVerbose) {
+            console.info("")
+            console.info("Message from topic " + topic)
+            console.info("  parsed: " + JSON.stringify(configs, null, 2))
+        }
+    } catch (error) {
+        console.error('Json parse on topic ' + topic + ' message was; ' + message)
+        console.error(error);
+        return undefined;
+    }
+    return msg;
+}
+
 export const handleMessage = (
     topic: string,
     message: string,
@@ -18,18 +36,8 @@ export const handleMessage = (
     isVerbose: boolean
 ) => {
     const configs = transforms.filter(element => element.fromTopics.some(subscription => mqttMatch(subscription, topic)));
-    let msg: any;
-    try {
-        msg = JSON.parse(message)
-        msg = fixupMessageForJsoneKeys(msg)
-        if(isVerbose) {
-            console.info("")
-            console.info("Message from topic " + topic)
-            console.info("  parsed: " + JSON.stringify(configs, null, 2))
-        }
-    } catch (error) {
-        console.error('Json parse on topic ' + topic + ' message was; ' + message)
-        console.error(error);
+    const msg = parseMessage(message, topic, configs, isVerbose)
+    if(msg === undefined) {
         return
     }
     if(isVerbose) {

@@ -1,4 +1,4 @@
-type EmitType = 'constant' | 'repeat' | 'once' | 'map' | 'filter' | 'collect' | 'zipLast' | 'combineLatest'
+type EmitType = 'constant' | 'repeat' | 'once' | 'map' | 'filter' | 'collect' | 'zipLast' | 'combineLatest' | 'reduce'
 type IOType = 'webserver' | 'mqtt' | 'hookCall'
 
 interface Transformer {
@@ -12,14 +12,14 @@ interface Transformation {
     id: number,
     fromTopics: string[],
     topicKeyToMessage?: string,
-    toTopicTemplate: string,
+    toTopicTemplate: string | object,
     emitType: EmitType,
     wrapper?: string,
     useConstants?: object,
     useMetrics?: object,
 }
 
-export type TransformationOps = RepeatOps | OnceOps | MapOps | CollectOps | ZipLastOps | CombineLatestOps
+export type TransformationOps = RepeatOps | OnceOps | MapOps | CollectOps | ZipLastOps | CombineLatestOps | ReduceOps
 export type AllSupportedOps = FilterOps | TransformationOps
 export type AllSupportedConfigs = ConstantDef | AllSupportedOps
 export type AllSupportedIOs = MqttIO | HookCallIO | WebserverIO
@@ -43,6 +43,10 @@ export interface OnceOps extends Transformation, Transformer {
 
 export interface MapOps extends Transformation, Transformer {
     emitType: "map",
+}
+
+export interface ReduceOps extends Transformation, Transformer {
+    emitType: "reduce",
 }
 
 export interface FilterOps extends Transformation, Filter {
