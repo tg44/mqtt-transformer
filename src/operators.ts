@@ -1,6 +1,6 @@
 import jsone from "json-e";
 import {CollectOps, TransformationOps, FilterOps, OnceOps, RepeatOps, AllSupportedOps} from "./types";
-import {PublishFunc} from "./handleMessage";
+import {parseMessage, PublishFunc} from "./handleMessage";
 
 export const evaluateTransformAndEmitLogic = (c: AllSupportedOps, mqttData: Map<string, any>, timerData: Map<number, object>, additionalConstants: object, mqttPublish: PublishFunc, isVerbose: boolean) => {
     if(c.emitType === 'repeat') {
@@ -35,6 +35,16 @@ export const evaluateTransformAndEmitLogic = (c: AllSupportedOps, mqttData: Map<
         const allData = gatherAllData(c, mqttData)
         if(hasAllDataPredicate(c, allData)){
             mapAndEmit(c, {...additionalConstants, ...{messages: allData}}, mqttPublish, isVerbose)
+        }
+    } else if(c.emitType === 'reduce') {
+        if(typeof c.toTopicTemplate === 'string') {
+            const data = mqttData.get(c.id+c.fromTopics[0])
+            const stateData = parseMessage(mqttData.get(c.toTopicTemplate), c.toTopicTemplate, [c], isVerbose)
+            if(data) {
+                mapAndEmit(c, {...additionalConstants, ...{message: data, state: stateData ?? {}}}, mqttPublish, isVerbose)
+            }
+        } else {
+            console.error('ReduceOps toTopicTemplate must be string')
         }
     } else {
         // @ts-ignore

@@ -8,8 +8,8 @@
   },
   "main": "src/app.ts",
   "scripts": {
-    "test": "`npm bin`/ts-interface-builder src/types.ts && nyc ./node_modules/.bin/_mocha 'test/**/*.test.ts'",
-    "build": "`npm bin`/ts-interface-builder src/types.ts && npx tsc"
+    "test": "npx ts-interface-builder src/types.ts && nyc ./node_modules/.bin/_mocha 'test/**/*.test.ts'",
+    "build": "npx ts-interface-builder src/types.ts && npx tsc"
   },
   "keywords": [],
   "author": "tg44",

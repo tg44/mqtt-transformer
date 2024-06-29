@@ -30,6 +30,7 @@ const metricsData: Map<string, MetricsData> = new Map()
 const publishers: {io: AllSupportedIOs, publisher?: PublishFunc}[] = []
 
 const globalPublisher = (topic: string, message: string) => {
+  mqttData.set(topic, message)
   publishers.forEach(p => {
     if(p.publisher && topic.startsWith(p.io.topicPrefix || "")) {
       const t = p.io.topicPrefix ? topic.replace(p.io.topicPrefix, "") : topic

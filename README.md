@@ -82,6 +82,12 @@ When it gets an element in each topic, it calls the `template`, emits the output
 
 The `template` will get a `{messages: []}` object, the indexes will match to the topic indexes.
 
+### Reduce
+
+Gets the messages from the given topic(s), and the old state from the last emitted message, and combines them.
+The `template` will get a `{message: {}, state: {}}` object. 
+`toTopic` should be used, `toTopicTemplate` will not work!
+
 ### Constants
 
 You can add commonly used constants as a "transformation".
