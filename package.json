@@ -15,7 +15,7 @@
   "author": "tg44",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.18.2",
+    "express": "^4.21.1",
     "json-e": "~4.4.3",
     "mqtt": "^4.3.7",
     "mqtt-match": "~2.0.3",
