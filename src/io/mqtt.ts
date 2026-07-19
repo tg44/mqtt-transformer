@@ -28,7 +28,7 @@ export const initMqtt = (
     client.on('connect', () => {
         console.info(`MQTT(${mqttConf.id}): Connected to ${mqttConf.url}`)
         const topics = [...new Set(transforms.flatMap(element => element.fromTopics.map(
-            topic => topicPrefix ? topic.replace(new RegExp(`^${topicPrefix}`), "") : topic
+            topic => topic.startsWith(topicPrefix) ? topic.slice(topicPrefix.length) : topic
         )))]
         topics.forEach(element => {
             client.subscribe(element)
