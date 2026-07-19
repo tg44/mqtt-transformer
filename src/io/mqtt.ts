@@ -27,7 +27,9 @@ export const initMqtt = (
 
     client.on('connect', () => {
         console.info(`MQTT(${mqttConf.id}): Connected to ${mqttConf.url}`)
-        const topics = [...new Set(transforms.flatMap(element => element.fromTopics))]
+        const topics = [...new Set(transforms.flatMap(element => element.fromTopics.map(
+            topic => topicPrefix ? topic.replace(new RegExp(`^${topicPrefix}`), "") : topic
+        )))]
         topics.forEach(element => {
             client.subscribe(element)
             if(isVerbose) {
