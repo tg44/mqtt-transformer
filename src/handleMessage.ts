@@ -2,13 +2,14 @@ import {AllSupportedOps, ConstantDef, MetricsData} from "./types";
 import mqttMatch from "mqtt-match";
 import {evaluateTransformAndEmitLogic} from "./operators";
 import {hasKey} from "./utils";
+const EMPTY_MESSAGE = Symbol();
 
 export type PublishFunc = (topic: string, message: string) => void
 
 export const parseMessage = (message: string, topic: string, configs: AllSupportedOps[], isVerbose: boolean): undefined | Record<string,any> => {
     let msg: any;
     try {
-        msg = JSON.parse(message)
+        msg = message ? JSON.parse(message) : EMPTY_MESSAGE
         msg = fixupMessageForJsoneKeys(msg)
         if(isVerbose) {
             console.info("")
@@ -102,7 +103,7 @@ function updateMetricsData(metricsData: Map<string, MetricsData>, topic: string,
 
 
 function fixupMessageForJsoneKeys(obj: any): any {
-    if(typeof(obj) === 'object') {
+    if(typeof(obj) === 'object' && obj !== null) {
         if(Array.isArray(obj)) {
             return obj.map(e => fixupMessageForJsoneKeys(e))
         } else {
